@@ -1,0 +1,16 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+select distinct ?name
+where {
+  ?x rdfs:label ?labelx.
+  ?cat
+    a skos:Concept;
+    rdfs:label ?labelcat.
+  filter contains(str(?cat), "resource/Category:")
+  filter (?x != ?cat)
+  filter (?labelx = ?labelcat)
+  bind(
+    strafter(str(?x), "resource/")
+    as ?name
+  )
+}

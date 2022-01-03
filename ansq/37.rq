@@ -1,0 +1,38 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+select distinct ?p1 ?p2 ?pp
+where {
+  ?w1
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w2
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w3
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w4
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?p1
+    dbp:production #|dbo:wikiPageWikiLink
+      dbr:ジャニーズ事務所;
+    rdfs:label ?pl1.
+  ?p2 rdfs:label ?pl2.
+  filter (?w1 != ?w2)
+  filter (?w1 != ?w3)
+  filter (?w1 != ?w4)
+  filter (?w2 != ?w3)
+  filter (?w2 != ?w4)
+  filter (?w3 != ?w4)
+  filter (?p1 != ?p2)
+  bind(
+    if(
+      ?p1 < ?p2,
+      concat(?pl1, "-", ?pl2),
+      concat(?pl2, "-", ?pl1)
+    ) as ?pp
+  )
+}

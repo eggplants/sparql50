@@ -343,27 +343,7 @@ where {
 
 ### 20. 声優
 
-#### DBpedia
-
-```rq
-PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
-PREFIX dc: <http://purl.org/dc/terms/>
-PREFIX dbr: <http://ja.dbpedia.org/resource/>
-select ?name
-where {
-  ?actor
-    dc:subject ?s;
-    rdfs:label ?name.
-  filter (
-    ?s in (
-      dbr:Category:日本の男性声優,
-      dbr:Category:日本の女性声優
-    )
-  )
-}
-```
-
-#### [NDLA](https://id.ndl.go.jp/auth/ndla/sparql)
+- [NDLA](https://id.ndl.go.jp/auth/ndla/sparql)エンドポイントで検索する
 
 ```rq
 PREFIX rda: <http://RDVocab.info/ElementsGr2/>
@@ -1065,10 +1045,8 @@ limit 100
 - openlink virtuoso環境のみで動作
 - `bif:exec(sql, state, msg, params, maxrow, metadata, rows, cursor)`
 - BDpediaでは:
-
-```text
-Virtuoso 37000 Error SP031: SPARQL compiler: Function http://www.openlinksw.com/schemas/bif#exec() cannot be used in text of SPARQL query due to security restrictions
-```
+  - `Virtuoso 37000 Error SP031:`
+  - `exec() cannot be used in text of SPARQL query due to security restrictions`
 
 ```rq
 PREFIX bif: <http://www.openlinksw.com/schemas/bif#>

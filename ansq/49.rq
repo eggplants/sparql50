@@ -1,0 +1,32 @@
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select
+  ?sparql ?sql ?exec
+  ?state ?message
+  (bif:length(?rows) as ?len)
+  (bif:aref(bif:aref(?rows, 0), 0) as ?c0)
+  (bif:aref(bif:aref(?rows, 0), 1) as ?l0)
+  (bif:aref(bif:aref(?rows, 1), 0) as ?c1)
+  (bif:aref(bif:aref(?rows, 1), 1) as ?l1)
+  (bif:aref(bif:aref(?rows, 2), 0) as ?c2)
+  (bif:aref(bif:aref(?rows, 2), 1) as ?l2)
+where {
+  ?x ?y ?z.
+  bind(concat(
+    'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n',
+    'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n',
+    'select * where {',
+      '?c',
+        'a skos:Concept;',
+        'rdfs:label ?cl}'
+    ) as ?sparql) # 実行するクエリ
+  bind(str(bif:sparql_to_sql_text(?sparql)) as ?sql) # クエリをsqltextにしたもの
+  bind("" as ?state) # 状態指定
+  bind("no error" as ?message) # エラーメッセージの指定
+  bind(bif:vector() as ?meta) # 返却されるメタ情報を格納する変数
+  bind(bif:vector() as ?rows) # 返却されるデータを格納する変数
+  bind(bif:exec( # クエリの実行
+    ?sql, ?state, ?message,
+    bif:vector(), 3, # 最大行数
+    ?meta, ?rows)as ?exec
+  )
+}

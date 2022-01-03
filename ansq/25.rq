@@ -1,0 +1,11 @@
+select ?y ?num
+where {
+  bind(14 as ?n)
+  filter(?n <= ?num)
+  {
+    select ?y (count(?y) as ?num)
+    where {
+      ?x a ?y.
+    } group by ?y
+  }
+} order by desc(?num)

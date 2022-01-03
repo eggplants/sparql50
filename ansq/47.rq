@@ -1,0 +1,18 @@
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select ?n ?out
+where {
+  ?x
+    dbp:wikiPageUsesTemplate dbr:Template:自然数;
+    rdfs:label ?i.
+  bind(xsd:integer(?i) as ?n)
+  filter(?n>0)
+  bind(
+    if(?n/15*15=?n, "FB",
+      if(?n/5*5=?n, "B",
+        if(?n/3*3=?n, "F", ?n))) as ?out)
+} order by ?n
+limit 100

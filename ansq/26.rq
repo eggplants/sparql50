@@ -1,0 +1,18 @@
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select
+  ?pref
+  (count(?pref) as ?num)
+  (group_concat(?x; separator="|") as ?medalists)
+where {
+  ?x
+    dc:subject dbr:Category:日本のオリンピック金メダリスト;
+    dc:subject ?y;
+    rdfs:label ?name.
+  ?y rdfs:label ?p.
+  filter regex(?p, "[都道府県]出身の人物")
+  bind(replace(?p, "(.*)出身の人物$", "$1") as ?pref)
+}
+group by ?pref
+order by desc(?num)

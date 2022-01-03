@@ -1,0 +1,5 @@
+select distinct ?g {
+  graph ?g {
+    ?x ?y ?z.
+  }
+}

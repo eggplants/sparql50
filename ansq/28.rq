@@ -1,0 +1,13 @@
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select ?name ?country
+where {
+  ?x
+    dc:subject ?y;
+    rdfs:label ?name;
+    dbp:country ?country.
+  ?y  skos:broader dbr:Category:五十音順の世界遺産. 
+}

@@ -1,0 +1,34 @@
+# timeout
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?anime ?category
+where {
+  ?y
+    # dbo:wikiPageWikiLink dbr:アニメ;
+    dc:subject ?category;
+    rdfs:label ?anime.
+  {
+    select
+      (IRI(
+        concat(
+          str(dbr:),
+          "Category:"^^xsd:string,
+          ?sex,
+          ?sport,
+          ?suffix
+      )) as ?category)
+    where {
+      ?x
+        dbp:wikiPageUsesTemplate dbr:Template:スポーツ一覧;
+        rdfs:label ?sport.
+      values ?sex {"" #"男子" "女子"
+      }
+      values ?suffix {"アニメ"# "を題材としたアニメ作品"
+      }
+    }
+  }
+}

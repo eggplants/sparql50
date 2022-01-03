@@ -1,0 +1,15 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+select ?line ?station
+where {
+  ?x
+    dbp:駅番号 "TX01"@ja;
+    dbo:servingRailwayLine ?line.
+  ?line
+    ^dbo:servingRailwayLine ?station.
+  filter(?station != ?x)
+}
+order by (bif:rand(100, ?station, ?line))
+limit 1

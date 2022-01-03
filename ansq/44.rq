@@ -1,0 +1,20 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select
+  (IRI(
+    concat(
+      str(dbr:),
+      "Category:"^^xsd:string,
+      ?sex,
+      ?sport,
+      ?suffix
+  )) as ?category)
+where {
+  ?x
+    ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+    rdfs:label ?sport.
+  values ?sex {"" "男子" "女子"}
+  values ?suffix {"アニメ" "を題材としたアニメ作品"}
+}

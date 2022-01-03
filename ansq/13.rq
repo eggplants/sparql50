@@ -1,0 +1,13 @@
+PREFIX dc: <http:/purl.org/dc/terms/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select ?code ?pref
+where {
+  ?pref
+    dc:subject dbr:Category:日本の都道府県;
+    dbp:区分 ?category;
+    dbo:areaCode ?code.
+  filter regex(?category, "[都道府県]$")
+  filter contains(?code, "JP")
+} order by ?code

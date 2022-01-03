@@ -1,0 +1,15 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select
+  ?init
+  (count(?pl) as ?num)
+  (group_concat(?pllabel; separator="|") as ?langs)
+where {
+  ?pl
+    a dbo:ProgrammingLanguage;
+    rdfs:label ?pllabel.
+  bind (
+    substr(?pllabel, 1, 1)
+    as ?init
+  )
+} group by ?init order by desc(?num)

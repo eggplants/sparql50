@@ -1,0 +1,10 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+select ?s
+where {
+  ?s dbp:生年 ?birthDate .
+  filter(
+    "1950-01-01"^^xsd:date < ?birthDate &&
+    ?birthDate < "1959-12-31"^^xsd:date
+  )
+}

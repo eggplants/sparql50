@@ -1,0 +1,4 @@
+select (rand() as ?a)
+where {
+  ?x ?y ?z.
+} limit 10

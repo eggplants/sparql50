@@ -1,0 +1,7 @@
+select ?y (count(?y)) as ?num)
+where {
+  ?x a ?y
+}
+group by ?y
+having (14 <= count(?y))
+order by desc(count(?y))

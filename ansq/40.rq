@@ -1,0 +1,9 @@
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+select (count(?c) as ?depth)
+where {
+  ?c
+    skos:broader* dbr:Category:アニメ;
+    ^skos:broader* ?child.
+} group by ?child
+limit 1

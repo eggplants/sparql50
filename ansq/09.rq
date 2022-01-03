@@ -1,0 +1,15 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+select distinct ?name ?kamonName
+where {
+  ?entry
+    rdfs:label ?name;
+    dbp:家紋名称 ?kamon.
+  bind (
+    if(isIRI(?kamon),
+       replace(
+         str(?kamon), "^.+/resource/([^/]+)/?$", "$1"
+       ),
+       str(?kamon))
+    as ?kamonName)
+}

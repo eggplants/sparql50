@@ -1,0 +1,19 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select ?family (count(?family) as ?num)
+where {
+  ?x
+    a dbo:Person;
+    dbo:nationality dbr:日本;
+    dbo:abstract ?abst.
+  bind(
+    replace(?abst, "^([^ ]+).*", "$1")
+    as ?family
+  )
+  filter(
+    0 < strlen(?family) && strlen(?family) < 10
+  )
+}
+group by ?family
+order by desc(?num)

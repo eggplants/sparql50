@@ -1,0 +1,31 @@
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+select
+  ?pref
+  (count(?mount) as ?num)
+  (group_concat(?mount;separator="|") as ?mounts)
+where {
+  ?x
+    dc:subject dbr:Category:日本の都道府県;
+    rdfs:label ?pref.
+  filter contains(?prefs, str(?pref))
+  {
+    select
+      ?mount
+      (group_concat(?p; separator="|") as ?prefs)
+    where {
+      ?x
+        dbo:wikiPageWikiLink dbr:Category:アジアの山;
+        dbo:address ?p;
+        rdfs:label ?mount.
+      filter regex(?p, "^[亜-煕]+[都道府県]")
+    }
+    group by ?mount
+    having (count(?p) > 1)
+  }
+}
+group by ?pref
+order by desc(?num)

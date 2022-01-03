@@ -1,0 +1,4 @@
+PREFIX prop: <http://ja.dbpedia.org/property/>
+ask {
+  prop:ja ?y ?z.
+}

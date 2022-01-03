@@ -1,0 +1,17 @@
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select
+  distinct ?name
+  (count(?pref) as ?num)
+  (group_concat(?pref; separator="|") as ?prefs)
+where {
+  ?x
+    ^dbo:wikiPageWikiLink dbr:日本の山一覧;
+    rdfs:label ?name;
+    dc:subject ?y.
+  ?y rdfs:label ?p.
+  filter regex(?p, "^.*[都道府県]の.*山$")
+  bind(strbefore(?p,"の山") as ?pref)
+} order by desc(?num)

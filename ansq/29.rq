@@ -1,0 +1,18 @@
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select
+  ?category
+  (count(?word) as ?num)
+  (group_concat(?word; separator="|") as ?words)
+where {
+  ?x
+    dc:subject ?y;
+    rdfs:label ?word.
+  ?y
+    skos:broader dbr:Category:借用語;
+    rdfs:label ?category.
+  filter contains(?category, "からの借用語")
+} group by ?category order by desc(?num)

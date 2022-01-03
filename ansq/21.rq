@@ -1,0 +1,7 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select ?x
+where {
+  ?x ^dbo:wikiPageWikiLink dbr:日本の山一覧.
+  # dbr:日本の山一覧 dbo:wikiPageWikiLink ?x.
+}

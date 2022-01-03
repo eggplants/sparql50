@@ -1,0 +1,13 @@
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+select
+  ?name
+  (count(distinct ?ideorogy) as ?num)
+  (group_concat(distinct ?ideorogy; separator="|") as ?ideorogies)
+where {
+  ?x
+    dbp:ideology|dbo:政治的思想・立場 ?y;
+    rdfs:label ?name.
+  ?y rdfs:label ?ideorogy.
+} order by desc(?num)

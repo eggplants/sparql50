@@ -1,0 +1,9 @@
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+select distinct ?cat
+where {
+  ?x a skos:Concept.
+  filter contains(str(?x), "resource/Category:")
+  bind(
+    strafter(str(?x), "y:") as ?cat
+  )
+}

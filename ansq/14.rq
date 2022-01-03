@@ -1,0 +1,18 @@
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select distinct ?name
+where {
+  ?anime dc:subject ?cat.
+  filter (
+    ?cat in
+    (
+      dbr:Category:バレーボールを題材とした作品,
+      dbr:Category:女子バレーボールを題材とした作品,
+      dbr:Category:バレーボール漫画
+    )
+  )
+  bind(
+    strafter(str(?anime), "resource/")
+    as ?name
+  )
+} order by ?name

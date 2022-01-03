@@ -1,0 +1,9 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select distinct ?category
+where {
+ ?x
+   skos:broader+ dbr:Category:アニメ;
+   rdfs:label ?category.
+}

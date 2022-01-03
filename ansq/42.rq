@@ -1,0 +1,19 @@
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select distinct ?locProp ?name
+where {
+  ?x2 ?locProp ?name.
+  {
+    select distinct (IRI(?prop) as ?locProp)
+    where {
+      ?locType ^dbp:subdivisionType ?x1. # 地名区分の取得
+      bind(
+        concat(
+          replace(str(?locType), "resource", "property"),
+          "名"^^xsd:string
+        ) as ?prop # dbp:〇〇名
+      )
+    }
+  }
+}

@@ -1,0 +1,7 @@
+select ?x ?y
+from <http://example.org/foo>
+from <http://example.org/bar>
+from <http://example.org/baz>
+where {
+  ?x <http://example.org/term> ?y.
+}

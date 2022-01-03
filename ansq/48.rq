@@ -1,0 +1,9 @@
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select
+(bif:sequence_next("my_unique_key", 1, ?x, ?y, ?z) as ?id)
+  ?c
+where {
+  ?x ?y ?z.
+  bind(bif:sequence_set("my_unique_key", 1, 0) as ?c)
+}
+limit 100

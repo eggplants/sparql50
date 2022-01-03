@@ -1,0 +1,17 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+select ?name
+where {
+  ?actor
+    dc:subject dbr:Category:東京都出身の人物;
+    dbp:職業 dbr:俳優;
+    dbp:生年 ?year;
+    rdfs:label ?name.
+  filter (
+    datatype(?year) = xsd:integer && # 生年->`不詳`があるので排除
+    year(now()) - ?year <= 50
+  )
+}

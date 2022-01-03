@@ -1,0 +1,5 @@
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select (bif:rnd(10, ?s, ?p, ?o) as ?rand)
+where {
+  ?x ?y ?z.
+} limit 10

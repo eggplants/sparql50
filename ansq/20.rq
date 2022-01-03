@@ -1,0 +1,11 @@
+PREFIX rda: <http://RDVocab.info/ElementsGr2/>
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+select ?name
+where {
+  ?concept foaf:primaryTopic ?topic. # 典拠
+  ?topic
+    a foaf:Person;
+    foaf:name ?name; # 名称
+    rda:biographicalInformation ?work.
+  filter contains(?work, "声優")
+}

@@ -1,0 +1,10 @@
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select
+  (bif:sys_stat("st_dbms_name") as ?name)
+  (bif:sys_stat("st_dbms_ver") as ?ver)
+  (bif:sys_stat("st_build_date") as ?date)
+  (bif:sys_stat("st_build_thread_model") as ?thread)
+  (bif:sys_stat("st_build_opsys_id") as ?opsys)
+where {
+  ?s ?p ?o
+} limit 1

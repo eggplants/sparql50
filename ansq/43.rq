@@ -1,0 +1,86 @@
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?anime ?category
+where {
+  ?x
+    dbo:wikiPageWikiLink dbr:アニメ;
+    dc:subject ?category;
+    rdfs:label ?anime.
+  {
+    select ?category
+    where {
+      {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+          concat(
+            str(dbr:),
+            "Category:"^^xsd:string,
+            ?sport,
+            "アニメ"^^xsd:string
+          )
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:"^^xsd:string,
+              ?sport,
+              "を題材としたアニメ作品"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:男子"^^xsd:string,
+              ?sport,
+              "アニメ"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:男子"^^xsd:string,
+              ?sport,
+              "を題材としたアニメ作品"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:女子"^^xsd:string,
+              ?sport,
+              "アニメ"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:女子"^^xsd:string,
+              ?sport,
+              "を題材としたアニメ作品"^^xsd:string)
+        ) as ?category)
+      }
+    }
+  }
+}
