@@ -1,1 +1,1 @@
-
+select ?s where {bind("select ?s where {bind('' as ?s)} limit 1" as ?s)} limit 1

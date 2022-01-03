@@ -1085,6 +1085,8 @@ where {
 
 ### 50. Quine
 
+- 実行結果がクエリ文
+
 ```rq
-select ?s where {bind('select ?s where {bind("a" as ?s)} limit 1' as ?s)} limit 1
+select ?s where {bind("select ?s where {bind('' as ?s)} limit 1" as ?s)} limit 1
 ```
