@@ -2,12 +2,12 @@
 
 c=0
 ind=0
-if ! [ -f "./SPARQL50.md" ]; then
+if ! [ -f "./README.md" ]; then
   exit 1
 fi
 
 # shellcheck disable=SC2016
-sed -n '/```rq/,/```/p'  SPARQL50.md |
+sed -n '/```rq/,/```/p'  README.md |
   while IFS='' read -r i; do
     if [ "$i" = '```rq' ]; then
       c=1
