@@ -1086,5 +1086,5 @@ where {
 ### 50. Quine
 
 ```rq
-
+select ?s where {bind('select ?s where {bind("a" as ?s)} limit 1' as ?s)} limit 1
 ```
