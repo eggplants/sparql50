@@ -4,8 +4,8 @@
 
 ## 準備
 
-- interface: https://yasgui.triply.cc/
-- default endpoint: https://ja.dbpedia.org/sparql
+- interface: <https://yasgui.triply.cc/>
+- default endpoint: <https://ja.dbpedia.org/sparql>
 
 ## 初級
 
@@ -161,7 +161,7 @@ where {
 
 ### 11. カテゴリ
 
-- `CONTAINS(str, contained-str)` function - 特定部分文字列が含まれているか判定 
+- `CONTAINS(str, contained-str)` function - 特定部分文字列が含まれているか判定
 
 ```rq
 PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
@@ -404,7 +404,7 @@ where {
 } limit 10
 ```
 
-##  中級
+## 中級
 
 ### 23. DBpediaで上位カテゴリをもたないカテゴリ
 
@@ -653,64 +653,354 @@ where {
 ### 36. ジャニタレと4回以上共演した人物(重複組許容)
 
 ```rq
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+select distinct ?p1 ?p2
+where {
+  ?w1
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w2
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w3
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w4
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?p1
+    dbp:production #|dbo:wikiPageWikiLink # too large
+      dbr:ジャニーズ事務所;
+    rdfs:label ?pl1.
+  ?p2 rdfs:label ?pl2.
+
+  filter (?w1 != ?w2)
+  filter (?w1 != ?w3)
+  filter (?w1 != ?w4)
+  filter (?w2 != ?w3)
+  filter (?w2 != ?w4)
+  filter (?w3 != ?w4)
+  filter (?p1 != ?p2)
+}
 ```
 
 ### 37. ジャニタレと4回以上共演した人物(重複組削除)
 
 ```rq
-
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+select distinct ?p1 ?p2 ?pp
+where {
+  ?w1
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w2
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w3
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?w4
+    dbo:starring ?p1;
+    dbo:starring ?p2.
+  ?p1
+    dbp:production #|dbo:wikiPageWikiLink
+      dbr:ジャニーズ事務所;
+    rdfs:label ?pl1.
+  ?p2 rdfs:label ?pl2.
+  filter (?w1 != ?w2)
+  filter (?w1 != ?w3)
+  filter (?w1 != ?w4)
+  filter (?w2 != ?w3)
+  filter (?w2 != ?w4)
+  filter (?w3 != ?w4)
+  filter (?p1 != ?p2)
+  bind(
+    if(
+      ?p1 < ?p2,
+      concat(?pl1, "-", ?pl2),
+      concat(?pl2, "-", ?pl1)
+    ) as ?pp
+  )
+}
 ```
 
 ## 上級
 
 ### 38. 乱数 in Virtuoso
 
-- `bif:rnd(lim, ...seed)` function 
+- `bif:rnd(lim, ...seed)` function -
 
 ```rq
-
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select (bif:rnd(10, ?s, ?p, ?o) as ?rand)
+where {
+  ?x ?y ?z.
+} limit 10
 ```
 
 ### 39. 秋葉原駅の路線とその降車駅を１つ乱択
 
 ```rq
-
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+select ?line ?station
+where {
+  ?x
+    dbp:駅番号 "TX01"@ja;
+    dbo:servingRailwayLine ?line.
+  ?line
+    ^dbo:servingRailwayLine ?station.
+  filter(?station != ?x)
+}
+order by (bif:rand(100, ?station, ?line))
+limit 1
 ```
 
-### 40. パスの深さ
+### 40. `dbr:Category::アニメ`の下位カテゴリパスの深さ
+
+- 「アニメを上位カテゴリにもつカテゴリが持つ下位カテゴリの数の最大値」をカウントすれば良い
 
 ```rq
-
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX skos: <http://www.w3.org/2004/02/skos/core#>
+select (count(?c) as ?depth)
+where {
+  ?c
+    skos:broader* dbr:Category:アニメ;
+    ^skos:broader* ?child.
+} group by ?child
+limit 1
 ```
 
-### 41. 日本の県境の山 group by pref
+### 41. 日本の県境の山を県別集計
 
 ```rq
-
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+select
+  ?pref
+  (count(?mount) as ?num)
+  (group_concat(?mount;separator="|") as ?mounts)
+where {
+  ?x
+    dc:subject dbr:Category:日本の都道府県;
+    rdfs:label ?pref.
+  filter contains(?prefs, str(?pref))
+  {
+    select
+      ?mount
+      (group_concat(?p; separator="|") as ?prefs)
+    where {
+      ?x
+        dbo:wikiPageWikiLink dbr:Category:アジアの山;
+        dbo:address ?p;
+        rdfs:label ?mount.
+      filter regex(?p, "^[亜-煕]+[都道府県]")
+    }
+    group by ?mount
+    having (count(?p) > 1)
+  }
+}
+group by ?pref
+order by desc(?num)
 ```
 
-### 42. 地名を目的語に持つIRI動的生成
+### 42. 地名区分名である(`dbp:subdivisionType`)IRI(`dbp:〇〇名`)を作成して地名を列挙
+
+- `IRI(str))` function - 文字列をIRIにする
 
 ```rq
-
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select distinct ?locProp ?name
+where {
+  ?x2 ?locProp ?name.
+  {
+    select distinct (IRI(?prop) as ?locProp)
+    where {
+      ?locType ^dbp:subdivisionType ?x1. # 地名区分の取得
+      bind(
+        concat(
+          replace(str(?locType), "resource", "property"),
+          "名"^^xsd:string
+        ) as ?prop # dbp:〇〇名
+      )
+    }
+  }
+}
 ```
 
 ### 43. スポーツアニメ(`UNION`)
 
-```rq
+- 以下の2カテゴリを持つものを探す
+　- `dbr:Portal:アニメ`
+  - `dbp:Category:(|男子|女子){{ sports }}(アニメ|を題材としたアニメ作品)`
 
+```rq
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?anime ?category
+where {
+  ?x
+    dbo:wikiPageWikiLink dbr:アニメ;
+    dc:subject ?category;
+    rdfs:label ?anime.
+  {
+    select ?category
+    where {
+      {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+          concat(
+            str(dbr:),
+            "Category:"^^xsd:string,
+            ?sport,
+            "アニメ"^^xsd:string
+          )
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:"^^xsd:string,
+              ?sport,
+              "を題材としたアニメ作品"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:男子"^^xsd:string,
+              ?sport,
+              "アニメ"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:男子"^^xsd:string,
+              ?sport,
+              "を題材としたアニメ作品"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:女子"^^xsd:string,
+              ?sport,
+              "アニメ"^^xsd:string)
+        ) as ?category)
+      } union {
+        ?x
+          ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+          rdfs:label ?sport.
+        bind(IRI(
+            concat(
+              str(dbr:),
+              "Category:女子"^^xsd:string,
+              ?sport,
+              "を題材としたアニメ作品"^^xsd:string)
+        ) as ?category)
+      }
+    }
+  }
+}
 ```
 
-### 44.  スポーツアニメとそのIRI
+### 44.  スポーツアニメのIRI
+
+- IRI`dbp:Category:(男子|女子|){{ sports }}(アニメ|を題材とした(アニメ|)作品)`を楽に生成
 
 ```rq
-
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+select
+  (IRI(
+    concat(
+      str(dbr:),
+      "Category:"^^xsd:string,
+      ?sex,
+      ?sport,
+      ?suffix
+  )) as ?category)
+where {
+  ?x
+    ^dbo:wikiPageWikiLink dbr:スポーツ競技一覧;
+    rdfs:label ?sport.
+  values ?sex {"" "男子" "女子"}
+  values ?suffix {"アニメ" "を題材としたアニメ作品"}
+}
 ```
 
-### 45.  スポーツアニメ(`UNION`なし)
+### 45.  スポーツアニメ
 
 ```rq
-
+# timeout
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX dc: <http://purl.org/dc/terms/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dbo: <http://dbpedia.org/ontology/>
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+select ?anime ?category
+where {
+  ?y
+    # dbo:wikiPageWikiLink dbr:アニメ;
+    dc:subject ?category;
+    rdfs:label ?anime.
+  {
+    select
+      (IRI(
+        concat(
+          str(dbr:),
+          "Category:"^^xsd:string,
+          ?sex,
+          ?sport,
+          ?suffix
+      )) as ?category)
+    where {
+      ?x
+        dbp:wikiPageUsesTemplate dbr:Template:スポーツ一覧;
+        rdfs:label ?sport.
+      values ?sex {"" #"男子" "女子"
+      }
+      values ?suffix {"アニメ"# "を題材としたアニメ作品"
+      }
+    }
+  }
+}
 ```
 
 ## 職人級
@@ -718,25 +1008,101 @@ where {
 ### 46. Virtuoso情報
 
 ```rq
-
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select
+  (bif:sys_stat("st_dbms_name") as ?name)
+  (bif:sys_stat("st_dbms_ver") as ?ver)
+  (bif:sys_stat("st_build_date") as ?date)
+  (bif:sys_stat("st_build_thread_model") as ?thread)
+  (bif:sys_stat("st_build_opsys_id") as ?opsys)
+where {
+  ?s ?p ?o
+} limit 1
 ```
 
 ### 47. FizzBuzz
 
 ```rq
-
+PREFIX dbp: <http://ja.dbpedia.org/property/>
+PREFIX dbr: <http://ja.dbpedia.org/resource/>
+PREFIX dct: <http://purl.org/dc/terms/>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+select ?n ?out
+where {
+  ?x
+    dbp:wikiPageUsesTemplate dbr:Template:自然数;
+    rdfs:label ?i.
+  bind(xsd:integer(?i) as ?n)
+  filter(?n>0)
+  bind(
+    if(?n/15*15=?n, "FB",
+      if(?n/5*5=?n, "B",
+        if(?n/3*3=?n, "F", ?n))) as ?out)
+} order by ?n
+limit 100
 ```
 
 ### 48. 連番
 
-```rq
+- openlink virtuoso環境のみで動作
+- `bif:sequence_set`を一回呼んで、`bif:sequence_next`でインクリメント
 
+```rq
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select
+(bif:sequence_next("my_unique_key", 1, ?x, ?y, ?z) as ?id)
+  ?c
+where {
+  ?x ?y ?z.
+  bind(bif:sequence_set("my_unique_key", 1, 0) as ?c)
+}
+limit 100
 ```
 
 ### 49. クエリ置換
 
-```rq
+- openlink virtuoso環境のみで動作
+- `bif:exec(sql, state, msg, params, maxrow, metadata, rows, cursor)`
+- BDpediaでは:
 
+```text
+Virtuoso 37000 Error SP031: SPARQL compiler: Function http://www.openlinksw.com/schemas/bif#exec() cannot be used in text of SPARQL query due to security restrictions
+```
+
+```rq
+PREFIX bif: <http://www.openlinksw.com/schemas/bif#>
+select
+  ?sparql ?sql ?exec
+  ?state ?message
+  (bif:length(?rows) as ?len)
+  (bif:aref(bif:aref(?rows, 0), 0) as ?c0)
+  (bif:aref(bif:aref(?rows, 0), 1) as ?l0)
+  (bif:aref(bif:aref(?rows, 1), 0) as ?c1)
+  (bif:aref(bif:aref(?rows, 1), 1) as ?l1)
+  (bif:aref(bif:aref(?rows, 2), 0) as ?c2)
+  (bif:aref(bif:aref(?rows, 2), 1) as ?l2)
+where {
+  ?x ?y ?z.
+  bind(concat(
+    'PREFIX skos: <http://www.w3.org/2004/02/skos/core#>\n',
+    'PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n',
+    'select * where {',
+      '?c',
+        'a skos:Concept;',
+        'rdfs:label ?cl}'
+    ) as ?sparql) # 実行するクエリ
+  bind(str(bif:sparql_to_sql_text(?sparql)) as ?sql) # クエリをsqltextにしたもの
+  bind("" as ?state) # 状態指定
+  bind("no error" as ?message) # エラーメッセージの指定
+  bind(bif:vector() as ?meta) # 返却されるメタ情報を格納する変数
+  bind(bif:vector() as ?rows) # 返却されるデータを格納する変数
+  bind(bif:exec( # クエリの実行
+    ?sql, ?state, ?message,
+    bif:vector(), 3, # 最大行数
+    ?meta, ?rows)as ?exec
+  )
+}
 ```
 
 ### 50. Quine
