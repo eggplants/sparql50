@@ -319,7 +319,7 @@ where {
 
 ### 19. 東京都出身 && 50歳以下 && 俳優
 
-- DATATYPE(resource)` function - 型取得
+- `DATATYPE(resource)` function - 型取得
 
 ```rq
 PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
