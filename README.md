@@ -1,6 +1,7 @@
 # SPARQL50
 
-[SPARQL50本ノック](https://www.dlsite.com/home/work/=/product_id/RJ261278.html)の自分の解答
+- [SPARQL50本ノック](https://www.dlsite.com/home/work/=/product_id/RJ261278.html)の自分の解答
+- [klis Advent Calendar 2021](https://adventar.org/calendars/6617)18日目
 
 ## 準備
 
