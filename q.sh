@@ -39,7 +39,7 @@ main(){
       format='text/csv'
       ;;
     "RDF" | "rdf" | "BINARY" | "binary" )
-      foramt='application/x-binary-rdf-results-table'
+      format='application/x-binary-rdf-results-table'
       ;;
     *)
       echo 'error: invalid format '"$format" >&2
